@@ -168,6 +168,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
+RestateAI
 .env
 .venv
 env/
