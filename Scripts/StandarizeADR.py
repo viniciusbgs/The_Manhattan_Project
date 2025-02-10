@@ -12,6 +12,7 @@ def StandarizeAddress(address):
     - Removes apartment/unit numbers after comma
     - Removes "N/A"
     - Removes periods
+    - Removes ordinal suffixes
     - Keeps the first number from ranges
     - Abreviates West and East
     - Abreviates "Street" and "Avenue"
@@ -29,6 +30,9 @@ def StandarizeAddress(address):
     # Remove periods
     address = address.replace('.', '')
     
+    # Remove ordinal suffixes (st, nd, rd, th)
+    address = re.sub(r'(\d+)(st|nd|rd|th)', r'\1', address, flags=re.IGNORECASE)
+
     # Replace number range with the first number
     address = re.sub(r'^(\d+)[&-]\d+', r'\1', address)
 
