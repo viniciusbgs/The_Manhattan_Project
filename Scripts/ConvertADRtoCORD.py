@@ -14,8 +14,10 @@ class Features:
     longitude: float = 0.0
     zipCode: int = 0
 
-# Returns features if found, else None
 def ForwardGeocode(address: str):
+    '''
+    Returns a list of features for the given address, or None if not found
+    '''
     try:
         response = requests.get(f"https://api.geocodify.com/v2/geocode?api_key={API_KEY}&q={address}")
         response.raise_for_status()  # Raise an error for HTTP issues
@@ -32,8 +34,10 @@ def ForwardGeocode(address: str):
         print(f"[-] Request failed: {e}")
         return None
 
-# Returns a Features object if found, else None
 def ParseFeatures(features: list[dict]):
+    '''
+    Returns a Features object from the given features list, or None if not found
+    '''
     if not features:
         return None
 
