@@ -1,12 +1,12 @@
 import requests
 import pandas as pd
-import time
 from dataclasses import dataclass
 from pathlib import Path
 
-API_KEY = "<Google API key>"
-DATA_PATH = Path("<Data.csv>")
-SAVE_PATH = Path("<Save.csv>")
+
+API_KEY = "<Geocoding API Key>"
+DATA_PATH = Path(".\\data2.csv")
+SAVE_PATH = Path(".\\data3.csv")
 
 @dataclass
 class Features:
@@ -17,42 +17,66 @@ class Features:
 def ForwardGeocode(address: str):
     '''
     Returns a list of features for the given address, or None if not found
+    Sleep is note needed since the API supports 50 (20ms) requests per second and its average time per request is 80ms
     '''
     try:
-        address = address.replace(" ", "+")
-        response = requests.get(f"https://maps.googleapis.com/maps/api/geocode/json?address={address}&key={API_KEY}")
+        # URL encode the address properly
+        encoded_address = requests.utils.quote(address)
+
+        response = requests.get(f"https://maps.googleapis.com/maps/api/geocode/json?address={encoded_address}&key={API_KEY}")
         response.raise_for_status()  # Raise an error for HTTP issues
 
         data = response.json()  # Convert response to JSON
-        features = data.get("response", {}).get("features", [])
 
-        if not features:
+        # Get the results array (this contains all matching locations)
+        results = data.get("results", [])
+
+        if not results:
             return None
 
-        return features  # Returns features
+        return results  # Returns results
 
     except requests.RequestException as e:
         print(f"[-] Request failed: {e}")
         return None
 
-def ParseFeatures(features: list[dict]):
+def ParseFeatures(results: list[dict]):
     '''
-    Returns a Features object from the given features list, or None if not found
+    Returns a Features object from the given results list, or None if not found
     '''
-    if not features:
+    if not results:
         return None
 
-    # Parse features
-    feature = features[0]
-    latitude, longitude = feature["geometry"]["coordinates"]
-    
-    # Some don't have postal code
     try:
-        zipCode = float(feature["properties"]["postalcode"])
-    except Exception:
-        zipCode = 0
+        # Get the first result (most relevant match)
+        result = results[0]
+        
+        # Extract coordinates from geometry
+        location = result["geometry"]["location"]
+        latitude = location["lat"]
+        longitude = location["lng"]
+        
+        # Extract postal code from address components
+        zipCode = 0.0  # Default value
+        for component in result["address_components"]:
+            if "postal_code" in component["types"]:
+                zipCode = float(component["long_name"])
+                break
 
-    return Features(latitude, longitude, zipCode)
+        return Features(latitude, longitude, zipCode)
+
+    except (KeyError, IndexError) as e:
+        print(f"[-] Error parsing features: {e}")
+        return None
+
+def UpdateRow(df: pd.DataFrame, index: int, features: Features):
+    df.at[index, "LATITUDE"] = features.latitude
+    df.at[index, "LONGITUDE"] = features.longitude
+    if postalCode == 0:
+        df.at[index, "ZIP CODE"] = features.zipCode
+    if postalCode != features.zipCode and features.zipCode != 0:
+        df.at[index, "ZIP CODE"] = features.zipCode
+        print(f"[!] {index}, {postalCode}, {features.zipCode}")
 
 # Create data frame
 df = pd.read_csv(DATA_PATH)
@@ -61,26 +85,23 @@ df = df.reset_index()
 # Store found addresses features to reduce API calls
 foundFeatures: dict[str, Features] = {}
 
-
 # Go through each row
 for index, row in df.iterrows():
-    address = row["ADDRESS"].strip() + ", Manhattan, NY, USA" # Add fixed info for more specific search
+    # Convert address to string
+    address = str(row["ADDRESS"])
+    address = address + ", Manhattan, NY, USA" # Add fixed info for more specific search
     postalCode = row["ZIP CODE"]
     
     # Check if address is already found
     if address in foundFeatures:
         print(f"[+] Using \"{address}\" features from cache")
         features = foundFeatures[address]
-        df.at[index, "LATITUDE"] = features.latitude
-        df.at[index, "LONGITUDE"] = features.longitude
-        if postalCode == 0:
-            df.at[index, "ZIP CODE"] = features.zipCode
+        UpdateRow(df, index, features)
         continue
 
     # Get features
     rawFeatures = ForwardGeocode(address)
     features = ParseFeatures(rawFeatures)
-    time.sleep(1) # Prevents API rate limit
 
     if rawFeatures is None:
         print("[-] Address \"{address}\" not found")
@@ -88,15 +109,11 @@ for index, row in df.iterrows():
 
     print(f"[+] Address \"{address}\" found")
 
+    # Add features to data frame
+    UpdateRow(df, index, features)
+    
     # Store features
     foundFeatures[address] = features
-
-    # Add features to data frame
-    df.at[index, "LATITUDE"] = features.latitude
-    df.at[index, "LONGITUDE"] = features.longitude
-    if postalCode == 0:
-        df.at[index, "ZIP CODE"] = features.zipCode
-
 
 # Save the data frame
 df.to_csv(SAVE_PATH, index=False)
