@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Manhattan Sales</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css"/>
+<style>
+    #map { height: 100vh; }
+    .control-panel {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.95);
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        font-family: Arial, sans-serif;
+        width: 300px;
+    }
+    .control-panel h3 {
+        margin: 0 0 15px 0;
+        font-size: 18px;
+        color: #333;
+    }
+    .slider-container {
+        margin-bottom: 20px;
+    }
+    .slider-container label {
+        display: block;
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 5px;
+    }
+    .slider-container input[type="range"] {
+        -webkit-appearance: none;
+        width: 100%;
+        height: 8px;
+        background: #ddd;
+        border-radius: 5px;
+        outline: none;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+    }
+    .slider-container input[type="range"]:hover {
+        opacity: 1;
+    }
+    .slider-container input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    .slider-container input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #007bff;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    .toggle-button {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        color: white;
+        background-color: #007bff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+    .toggle-button:hover {
+        background-color: #0056b3;
+    }
+    .toggle-button.active {
+        background-color: #28a745;
+    }
+</style>
+</head>
+<body>
+    <div class="control-panel">
+        <h3>Filtro de Ano</h3>
+        <input type="range" id="yearSlider" min="{{ min_year }}" max="{{ max_year }}" value="{{ min_year }}">
+        <span id="yearValue">{{ min_year }}</span>
+        
+        <button id="toggleAllData" class="toggle-button">Mostrar Todos os Anos</button>
+    </div>
+    
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
+    <script>
+        const map = L.map('map').setView([40.7831, -73.9712], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        
+        let markers = L.markerClusterGroup();
+        let currentYear = {{ min_year }};
+        let showingAllData = false;
+
+        async function loadYearData(year) {
+            try {
+                const endpoint = showingAllData ? '/data/all' : `/data/${year}`;
+                const response = await fetch(endpoint);
+                const result = await response.json();
+                
+                if (result.error) {
+                    console.error(result.error);
+                    return;
+                }
+
+                markers.clearLayers();
+                
+            result.data.forEach(property => {
+                const marker = L.circleMarker(
+                    [property.LATITUDE, property.LONGITUDE], {
+                        radius: 5,
+                        fillColor: '#ff0000',
+                        color: '#000',
+                        weight: 0.5,
+                        opacity: 0.8,
+                        fillOpacity: 0.7
+                    }
+                ).bindPopup(`
+                    <b>Preço:</b> $${property['SALE PRICE'].toLocaleString()}<br>
+                    <b>Latitude:</b> ${property.LATITUDE.toFixed(6)}<br>
+                    <b>Longitude:</b> ${property.LONGITUDE.toFixed(6)}
+                `);
+                
+                markers.addLayer(marker);
+            });
+
+                map.addLayer(markers);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Eventos
+        document.getElementById('yearSlider').addEventListener('input', (e) => {
+            if (!showingAllData) {
+                currentYear = parseInt(e.target.value);
+                document.getElementById('yearValue').textContent = currentYear;
+                loadYearData(currentYear);
+            }
+        });
+
+        document.getElementById('toggleAllData').addEventListener('click', () => {
+            showingAllData = !showingAllData;
+            const button = document.getElementById('toggleAllData');
+            
+            if (showingAllData) {
+                button.textContent = "Mostrar por Ano";
+                button.classList.add('active');
+                loadYearData(); // Carrega todos os dados
+            } else {
+                button.textContent = "Mostrar Todos os Anos";
+                button.classList.remove('active');
+                loadYearData(currentYear); // Volta a mostrar o ano selecionado
+            }
+        });
+
+        // Carregar dados iniciais
+        loadYearData(currentYear);
+    </script>
+</body>
+</html>
