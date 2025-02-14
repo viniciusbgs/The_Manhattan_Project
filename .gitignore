@@ -5,6 +5,8 @@
 # gitignore template for Jupyter Notebooks
 # website: http://jupyter.org/
 
+#catboost_info
+
 .ipynb_checkpoints
 */.ipynb_checkpoints/*
 
