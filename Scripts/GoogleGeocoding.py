@@ -4,9 +4,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 
-API_KEY = "<Geocoding API Key>"
-DATA_PATH = Path(".\\data2.csv")
-SAVE_PATH = Path(".\\data3.csv")
+API_KEY = "<Google Geocoding API Key>"
+DATA_PATH = Path(".\\<data>.csv")
+SAVE_PATH = Path(".\\<newData>.csv")
 
 @dataclass
 class Features:
@@ -84,6 +84,7 @@ df = df.reset_index()
 
 # Store found addresses features to reduce API calls
 foundFeatures: dict[str, Features] = {}
+
 
 # Go through each row
 for index, row in df.iterrows():
