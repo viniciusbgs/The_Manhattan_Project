@@ -19,6 +19,9 @@ body {
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 700px;
+    width: 100%;
+    max-height: 600px;
 }
 
 /* Estilo do título */
@@ -52,7 +55,8 @@ h1 {
 /* Estilo da imagem do imóvel */
 #propertyImage {
     max-width: 100%;
-    height: auto;
+    max-height: 350px;
+    height: max-content;
     border-radius: 10px;
     margin-bottom: 20px;
 }
@@ -77,4 +81,11 @@ h1 {
 
 .guess-button:hover {
     background-color: #218838; /* Cor ao passar o mouse */
+}
+
+/* Estilo do texto do nível */
+#levelText {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 20px;
 }
