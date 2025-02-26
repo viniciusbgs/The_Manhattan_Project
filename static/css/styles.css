@@ -43,3 +43,38 @@ h1 {
 #startButton:hover {
     background-color: #0056b3; /* Cor ao passar o mouse */
 }
+
+/* Estilo da área do jogo (inicialmente oculta) */
+.hidden {
+    display: none;
+}
+
+/* Estilo da imagem do imóvel */
+#propertyImage {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+/* Estilo dos botões de adivinhação */
+.buttons-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Espaço entre os botões */
+}
+
+.guess-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    background-color: #28a745;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.guess-button:hover {
+    background-color: #218838; /* Cor ao passar o mouse */
+}

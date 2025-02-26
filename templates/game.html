@@ -10,13 +10,17 @@
     <div class="game-container">
         <h1>Mini Game!</h1>
         <button id="startButton">Start Game</button>
+
+        <!-- Área do jogo (inicialmente oculta) -->
+        <div id="gameArea" class="hidden">
+            <img id="propertyImage" src="../static/images/chile.jpg" alt="Imagem do Imóvel">
+            <div class="buttons-container">
+                <button id="guessButton1" class="guess-button">R$ 500.000</button>
+                <button id="guessButton2" class="guess-button">R$ 750.000</button>
+            </div>
+        </div>
     </div>
 
-    <script>
-        // Adicionar funcionalidade ao botão
-        document.getElementById('startButton').addEventListener('click', () => {
-            alert('Game Started!'); // Exemplo de ação ao clicar no botão
-        });
-    </script>
+    <script src="../static/js/script.js"></script> <!-- Link para o arquivo JavaScript externo -->
 </body>
 </html>
