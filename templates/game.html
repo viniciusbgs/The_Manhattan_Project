@@ -4,20 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Game</title>
-    <style>
-        body {
-            background-color: white;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-size: 24px;
-            font-family: Arial, sans-serif;
-        }
-    </style>
+    <link rel="stylesheet" href="../static/css/styles.css"> <!-- Link para o arquivo CSS externo -->
 </head>
 <body>
-    <h1>Mini Game!</h1>
+    <div class="game-container">
+        <h1>Mini Game!</h1>
+        <button id="startButton">Start Game</button>
+    </div>
+
+    <script>
+        // Adicionar funcionalidade ao botão
+        document.getElementById('startButton').addEventListener('click', () => {
+            alert('Game Started!'); // Exemplo de ação ao clicar no botão
+        });
+    </script>
 </body>
 </html>

@@ -1,0 +1,45 @@
+/* Estilo do corpo da página */
+body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    background-image: url('../images/image.jpg'); /* Caminho corrigido */
+    background-size: cover; /* Cobrir toda a tela */
+    background-position: center; /* Centralizar a imagem */
+}
+
+/* Estilo do contêiner do jogo */
+.game-container {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.8); /* Fundo semi-transparente */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Estilo do título */
+h1 {
+    font-size: 36px;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Estilo do botão */
+#startButton {
+    padding: 15px 30px;
+    font-size: 18px;
+    color: white;
+    background-color: #007bff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#startButton:hover {
+    background-color: #0056b3; /* Cor ao passar o mouse */
+}
