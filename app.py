@@ -33,7 +33,7 @@ def init_db():
         if Imovel.query.count() == 0:
             try:
                 # Importa dados do CSV se disponível
-                df = pd.read_csv("data.csv")
+                df = pd.read_csv("Data/data.csv")
                 print("Dados do CSV carregados com sucesso! Importando para o banco de dados...")
                 
                 # Importa os dados para o banco
