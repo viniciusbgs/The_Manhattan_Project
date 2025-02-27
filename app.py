@@ -65,14 +65,15 @@ def get_data(year):
     if not request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return render_template("error.html", message="Direct access not allowed."), 403
 
-    results = query_db("SELECT `SALE PRICE`, LATITUDE, LONGITUDE FROM ManhattanSales WHERE YEAR_SOLD = (?)", (year, ))
+    # Query the sales for that year
+    sales = query_db("SELECT `SALE PRICE`, LATITUDE, LONGITUDE FROM ManhattanSales WHERE YEAR_SOLD = (?)", (year, ))
 
     # If there are no results for that year, it will be an empty map
-    if not results:
+    if not sales:
         return None
     
-    # Convert to list of dictionaries
-    sales = [dict(sale) for sale in results]
+    # Convert to list of dictionaries containing the sale data {price, lat, long}
+    sales = [dict(sale) for sale in sales]
 
     return jsonify( {'data': sales} )
 

@@ -4,98 +4,7 @@
     <title>Manhattan Sales</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/MarkerCluster.Default.css"/>
-    <style>
-        #map { height: 100vh; }
-        .control-panel {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            font-family: Arial, sans-serif;
-            width: 300px;
-        }
-        .control-panel h3 {
-            margin: 0 0 15px 0;
-            font-size: 18px;
-            color: #333;
-        }
-        .slider-container {
-            margin-bottom: 20px;
-        }
-        .slider-container label {
-            display: block;
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 5px;
-        }
-        .slider-container input[type="range"] {
-            width: 100%;
-            height: 8px;
-            background: #ddd;
-            border-radius: 5px;
-            outline: none;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-        .slider-container input[type="range"]:hover {
-            opacity: 1;
-        }
-        .slider-container input[type="range"]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: #007bff;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        .slider-container input[type="range"]::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: #007bff;
-            border-radius: 50%;
-            cursor: pointer;
-        }
-        .toggle-button {
-            width: 100%;
-            padding: 10px;
-            font-size: 14px;
-            color: white;
-            background-color: #007bff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .toggle-button:hover {
-            background-color: #0056b3;
-        }
-        .toggle-button.active {
-            background-color: #28a745;
-        }
-        /* Estilo do botão no canto superior direito */
-        #gameButton {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
-        }
-        #gameButton:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="../static/css/mapStyle.css">
 </head>
 <body>
     <!-- Botão no canto superior direito -->
@@ -113,68 +22,12 @@
 
     <!-- Scripts -->
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.4.1/leaflet.markercluster.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.heat/0.2.0/leaflet-heat.js"></script>
     <script>
-        const map = L.map('map').setView([40.783360, -73.964351], 10);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-        
-        let markers = L.markerClusterGroup();
-        let currentYear = JSON.parse('{{ min_year }}');
-
-        
-        async function loadYearData(year) {
-            try {
-                const endpoint = `/data/${year}`;
-                //const response = await fetch(endpoint);
-                const response = await fetch(endpoint, {headers: { "X-Requested-With": "XMLHttpRequest" }});
-                const result = await response.json();
-                
-                if (result.error) {
-                    console.error(result.error);
-                    return;
-                }
-
-                markers.clearLayers();
-                
-                result.data.forEach(property => {
-                    const marker = L.circleMarker(
-                        [property.LATITUDE, property.LONGITUDE], {
-                            radius: 5,
-                            fillColor: '#ff0000',
-                            color: '#000',
-                            weight: 0.5,
-                            opacity: 0.8,
-                            fillOpacity: 0.7
-                        }
-                    ).bindPopup(`
-                        <b>Preço:</b> $${property['SALE PRICE'].toLocaleString()}<br>
-                        <b>Latitude:</b> ${property.LATITUDE.toFixed(6)}<br>
-                        <b>Longitude:</b> ${property.LONGITUDE.toFixed(6)}
-                    `);
-                    
-                    markers.addLayer(marker);
-                });
-
-                map.addLayer(markers);
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        }
-
-        // Eventos
-        document.getElementById('yearSlider').addEventListener('input', (e) => {
-            currentYear = parseInt(e.target.value);
-            document.getElementById('yearValue').textContent = currentYear;
-            loadYearData(currentYear);
-        });
-
-        // Função para redirecionar para a página "Game
-        function irParaGame() {
-            window.location.href = "/game";
-        }
-
-        // Carregar dados iniciais
-        loadYearData(currentYear);
+        // Passed variables are here so Jinja2 engine can process them before sending the HTML to the browser
+        const MIN_YEAR = JSON.parse('{{ min_year }}');
+        const MAX_YEAR = JSON.parse('{{ max_year }}');
     </script>
+    <script src="../static/js/mapScript.js"></script>
 </body>
 </html>
