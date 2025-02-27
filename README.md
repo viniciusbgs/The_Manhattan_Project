@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a web application built using Flask that visualizes the heatmap of the most expensive properties in Manhattan from 2003 to 2023. The data used in this project was obtained from the NYC government and has been preprocessed for analysis. Additionally, the application includes a mini-game where users are shown an image of a property and must guess its price.
+This project is a web application built using Flask that visualizes the heatmap of the most expensive properties in Manhattan from 2003 to 2023. Additionally, the application includes a mini-game where users are shown an image of a property and must guess its price.
 
 ---
 
@@ -10,7 +10,6 @@ This project is a web application built using Flask that visualizes the heatmap 
 
 - **Heatmap Visualization**: Interactive heatmap showing the distribution of the most expensive properties in Manhattan over the years (2003-2023).
 - **Price Guessing Game**: A fun mini-game where users are presented with an image of a property and must guess its price. The game includes multiple levels of difficulty.
-- **Data Preprocessing**: The project uses Pandas for data cleaning and preprocessing, ensuring the data is ready for visualization and analysis.
 - **Future Predictions**: Planned integration of a machine learning model to predict future property values based on historical data.
 
 ---
