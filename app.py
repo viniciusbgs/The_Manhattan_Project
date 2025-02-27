@@ -54,7 +54,7 @@ def index():
     results = query_db("SELECT MIN(YEAR_SOLD), MAX(YEAR_SOLD) FROM ManhattanSales")
 
     min_year, max_year = results[0] if results else (0, 0) # Check if there was a result
-    
+
     return render_template('map.html',
                             min_year=min_year,
                             max_year=max_year)
