@@ -1,7 +1,9 @@
 from flask import Flask, render_template, jsonify,g
 import sqlite3
+import os
 
-DATABASE = ".\\Data\\data.db"
+DATABASE = os.path.join("Data", "data.db")
+
 app = Flask(__name__)
 
 def get_db():
