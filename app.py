@@ -1,8 +1,9 @@
 from flask import Flask, render_template, jsonify,g
+from pathlib import Path
 import sqlite3
-import os
 
-DATABASE = os.path.join("Data", "data.db")
+
+DATABASE = Path("Data") / Path("data.db")
 
 app = Flask(__name__)
 
