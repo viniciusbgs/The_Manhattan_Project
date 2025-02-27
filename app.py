@@ -1,7 +1,6 @@
-from flask import Flask, render_template, jsonify,g
+from flask import Flask, render_template, jsonify, g, request
 from pathlib import Path
 import sqlite3
-
 
 DATABASE = Path("Data") / Path("data.db")
 
@@ -62,6 +61,10 @@ def index():
 
 @app.route('/data/<int:year>')
 def get_data(year):
+    # Block direct browser access
+    if not request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return render_template("error.html", message="Direct access not allowed."), 403
+
     results = query_db("SELECT `SALE PRICE`, LATITUDE, LONGITUDE FROM ManhattanSales WHERE YEAR_SOLD = (?)", (year, ))
 
     # If there are no results for that year, it will be an empty map
@@ -71,9 +74,7 @@ def get_data(year):
     # Convert to list of dictionaries
     sales = [dict(sale) for sale in results]
 
-    return jsonify({
-        'data': sales
-    })
+    return jsonify( {'data': sales} )
 
 @app.route('/game')
 def game():

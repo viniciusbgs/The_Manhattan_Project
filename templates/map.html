@@ -33,7 +33,6 @@
             margin-bottom: 5px;
         }
         .slider-container input[type="range"] {
-            -webkit-appearance: none;
             width: 100%;
             height: 8px;
             background: #ddd;
@@ -107,8 +106,6 @@
         <h3>Filtro de Ano</h3>
         <input type="range" id="yearSlider" min="{{ min_year }}" max="{{ max_year }}" value="{{ min_year }}">
         <span id="yearValue">{{ min_year }}</span>
-        
-        <button id="toggleAllData" class="toggle-button">Mostrar Todos os Anos</button>
     </div>
     
     <!-- Mapa -->
@@ -122,13 +119,14 @@
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
         
         let markers = L.markerClusterGroup();
-        let currentYear = {{ min_year }};
-        let showingAllData = false;
+        let currentYear = JSON.parse('{{ min_year }}');
 
+        
         async function loadYearData(year) {
             try {
-                const endpoint = showingAllData ? '/data/all' : `/data/${year}`;
-                const response = await fetch(endpoint);
+                const endpoint = `/data/${year}`;
+                //const response = await fetch(endpoint);
+                const response = await fetch(endpoint, {headers: { "X-Requested-With": "XMLHttpRequest" }});
                 const result = await response.json();
                 
                 if (result.error) {
@@ -165,26 +163,9 @@
 
         // Eventos
         document.getElementById('yearSlider').addEventListener('input', (e) => {
-            if (!showingAllData) {
-                currentYear = parseInt(e.target.value);
-                document.getElementById('yearValue').textContent = currentYear;
-                loadYearData(currentYear);
-            }
-        });
-
-        document.getElementById('toggleAllData').addEventListener('click', () => {
-            showingAllData = !showingAllData;
-            const button = document.getElementById('toggleAllData');
-            
-            if (showingAllData) {
-                button.textContent = "Mostrar por Ano";
-                button.classList.add('active');
-                loadYearData(); // Carrega todos os dados
-            } else {
-                button.textContent = "Mostrar Todos os Anos";
-                button.classList.remove('active');
-                loadYearData(currentYear); // Volta a mostrar o ano selecionado
-            }
+            currentYear = parseInt(e.target.value);
+            document.getElementById('yearValue').textContent = currentYear;
+            loadYearData(currentYear);
         });
 
         // Função para redirecionar para a página "Game
