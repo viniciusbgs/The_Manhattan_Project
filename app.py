@@ -57,25 +57,40 @@ def index():
 
     return render_template('map.html',
                             min_year=min_year,
-                            max_year=max_year)
+                            max_year=max_year
+                            )
 
 @app.route('/data/<int:year>')
 def get_data(year):
-    # Block direct browser access
-    if not request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        return render_template("error.html", message="Direct access not allowed."), 403
+    try:
+        # Block direct browser access
+        if not request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return render_template("error.html", message="Direct access not allowed."), 403
 
-    # Query the sales for that year
-    sales = query_db("SELECT `SALE PRICE`, LATITUDE, LONGITUDE FROM ManhattanSales WHERE YEAR_SOLD = (?)", (year, ))
+        # Query the sales for that year
+        sales = query_db("SELECT SALE_PRICE, LATITUDE, LONGITUDE FROM ManhattanSales WHERE YEAR_SOLD = (?)", (year, ))
 
-    # If there are no results for that year, it will be an empty map
-    if not sales:
-        return None
+        # If there are no results for that year, it will be an empty map
+        if not sales:
+            return None
+        
+        # Convert to list of dictionaries containing the sale data {price, lat, long}
+        sales = [dict(sale) for sale in sales]
+
+        # Send max price that year to tune the heat map
+        result = query_db("SELECT MAX(SALE_PRICE) FROM ManhattanSales")
+        max_price = result[0][0] if result else 0
+
+        return jsonify( {
+            'data': sales,
+            'max_price': max_price
+            } )
     
-    # Convert to list of dictionaries containing the sale data {price, lat, long}
-    sales = [dict(sale) for sale in sales]
-
-    return jsonify( {'data': sales} )
+    except Exception as e:
+        # Return an error response if something goes wrong
+        return jsonify({
+            'error': str(e)
+        }), 500
 
 @app.route('/game')
 def game():

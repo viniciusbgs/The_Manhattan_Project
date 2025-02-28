@@ -1,9 +1,15 @@
 const map = L.map('map',{
     zoomControl: false
 }).setView([40.783360, -73.964351], 10);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' // Dark mode map from CartoDB
-}).addTo(map);
+
+// Base maps
+const baseMaps = {
+    "Light": L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'),
+    "Dark": L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'),
+};
+  
+// Add the default style to the map
+baseMaps["Dark"].addTo(map);
 
 let heatLayer = null;
 let currentYear = MIN_YEAR;
@@ -12,7 +18,7 @@ async function loadYearData(year) {
     try {
         const endpoint = `/data/${year}`;
         const response = await fetch(endpoint, {
-            headers: { "X-Requested-With": "XMLHttpRequest" }
+            headers: { "X-Requested-With": "XMLHttpRequest" } // Add header to differentiate with the user
         });
         const result = await response.json();
         
@@ -25,18 +31,23 @@ async function loadYearData(year) {
         if (heatLayer) {
             map.removeLayer(heatLayer);
         }
+
+        // Check if there is data for that year
+        if (result.data.length === 0) {
+            console.warn('No data found for the selected year.');
+            return;
+        }
         
         // Format data for heatmap
         // Each point is [lat, lng, intensity] where intensity is based on price
-        const heatData = result.data.map(property => {
+        const heatData = result.data.map(sale => {
             // Normalize the sale price to get intensity (0-1 range)
-            // You might want to adjust this logic based on your price range
-            const maxPrice = 10000000; // Example max price $10M
-            const intensity = Math.min(property['SALE PRICE'] / maxPrice, 1);
+            // Boost the intensity because the max_price is an outlier
+            const intensity = Math.min((sale.SALE_PRICE / result.max_price) * 25, 1);
             
             return [
-                property.LATITUDE, 
-                property.LONGITUDE, 
+                sale.LATITUDE, 
+                sale.LONGITUDE, 
                 intensity
             ];
         });
@@ -55,32 +66,6 @@ async function loadYearData(year) {
                 1.0: 'red'
             }
         }).addTo(map);
-        
-        // Add click handler to show property details
-        map.on('click', function(e) {
-            // Find properties near the click point
-            const clickLat = e.latlng.lat;
-            const clickLng = e.latlng.lng;
-            const threshold = 0.001; // Approximate radius to search
-            
-            const nearbyProperties = result.data.filter(property => 
-                Math.abs(property.LATITUDE - clickLat) < threshold && 
-                Math.abs(property.LONGITUDE - clickLng) < threshold
-            );
-            
-            if (nearbyProperties.length > 0) {
-                // Show the closest property
-                const property = nearbyProperties[0];
-                L.popup()
-                    .setLatLng([property.LATITUDE, property.LONGITUDE])
-                    .setContent(`
-                        <b>Price:</b> $${property['SALE PRICE'].toLocaleString()}<br>
-                        <b>Latitude:</b> ${property.LATITUDE.toFixed(6)}<br>
-                        <b>Longitude:</b> ${property.LONGITUDE.toFixed(6)}
-                    `)
-                    .openOn(map);
-            }
-        });
     } catch (error) {
         console.error('Error:', error);
     }
