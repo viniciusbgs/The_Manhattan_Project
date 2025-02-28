@@ -1,4 +1,4 @@
-# REAL ESTATE AI - Manhattan Real Estate Heatmap and Price Prediction Game
+# Manhattan Project - Real Estate Heatmap and Price Prediction Game
 
 ## Overview
 
