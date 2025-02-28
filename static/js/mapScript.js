@@ -1,7 +1,9 @@
 const map = L.map('map',{
     zoomControl: false
 }).setView([40.783360, -73.964351], 10);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>' // Dark mode map from CartoDB
+}).addTo(map);
 
 let heatLayer = null;
 let currentYear = MIN_YEAR;
