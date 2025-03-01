@@ -1,4 +1,4 @@
-# Manhattan Project - Real Estate Heatmap and Price Prediction Game
+# The Manhattan Project - Real Estate Heatmap and Price Prediction Game
 
 ## Overview
 
