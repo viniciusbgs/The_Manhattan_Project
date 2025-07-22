@@ -14,6 +14,12 @@ This project is a web application built using Flask that visualizes the heatmap 
 
 ---
 
+## Demonstration
+
+![The Manhattan Project Demo](https://github.com/viniciusbgs/The_Manhattan_Project/raw/main/demo.gif)
+
+---
+
 ## Technologies Used
 
 - **Flask**: A lightweight web framework for Python used to build the web application.
