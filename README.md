@@ -31,8 +31,8 @@ To run this project locally, follow these steps:
 1.  **Clone the repository**:
 
    ```bash
-    git clone https://github.com/yourusername/manhattan-real-estate.git
-    cd manhattan-real-estate
+    git clone https://github.com/viniciusbgs/The_Manhattan_Project.git
+    cd The_Manhattan_Project
    ```
 2.  **Create a virtual environment**:
 
